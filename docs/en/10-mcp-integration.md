@@ -304,24 +304,3 @@ For stdio servers, stderr output is accumulated during connection and logged on 
 
 The enhanced error handler at `client.ts:1266` tracks consecutive terminal connection errors. After `MAX_ERRORS_BEFORE_RECONNECT` (3) consecutive terminal errors (ECONNRESET, ETIMEDOUT, EPIPE, etc.), the transport is force-closed to trigger reconnection. Non-terminal errors reset the counter.
 
----
-
-## 9. My Take
-
-Having traced through this implementation, a few things stand out.
-
-**MCP as an extension system works.** The architecture cleanly separates protocol concerns (transports, authentication, connection lifecycle) from application concerns (tool discovery, permission checking, UI state). A new MCP server plugs into Claude Code without any code changes -- you write a config entry, and the system handles everything from spawning the process to presenting the tools to the model. That is real extension system behavior, not just a protocol adapter.
-
-**The transport abstraction is doing heavy lifting.** Supporting stdio, SSE, streamable HTTP, WebSocket, in-process, and SDK-bridged transports from a single `connectToServer` function is not trivial. The in-process transport for Chrome and Computer Use servers is a particularly smart optimization -- avoiding a 325MB subprocess by running the server in-process via linked transport pairs. The SDK control transport for bridging to external processes via JSON-RPC over stdout is another creative solution to a real problem.
-
-**OAuth is the hardest part, and it shows.** The `auth.ts` file handles RFC 9728 discovery with RFC 8414 fallback, PKCE, token refresh with vendor-specific error normalization (Slack returning `invalid_refresh_token` instead of `invalid_grant`), cross-app access via IdP token exchange, credential storage in system keychains, and lock-file-based concurrency control for token refresh. The `normalizeOAuthErrorBody` function that rewrites HTTP 200 responses with error bodies to 400s (because Slack returns 200 for errors) captures the kind of real-world messiness this code has to deal with. This is the code that has clearly been battle-tested.
-
-**The permission model is well-layered but has a known trade-off.** Every MCP tool call goes through the same permission framework as built-in tools, which is correct. Enterprise policy enforcement via allowlists/denylists gives organizations real control. Project-level servers requiring approval is the right call. But the `checkPermissions` returning `passthrough` means the actual allow/deny decision happens elsewhere in the permission chain -- tracing exactly where an MCP tool call gets approved requires understanding the broader permission framework, not just the MCP layer.
-
-**Reconnection is thoughtful but asymmetric.** Remote servers get automatic reconnection with exponential backoff. Stdio servers do not reconnect because the child process is gone. This is the correct default, but it means a stdio server crash during a long-running task silently fails. The error handling for this case (catching McpError -32000 "Connection closed") is there, but the user experience is "tool failed" rather than "server crashed, want to restart it?"
-
-**The batched state update pattern is worth noting.** The 16ms flush timer for MCP state updates (`useManageMCPConnections.ts:207`) is a sensible optimization for the case where 20+ remote servers connect simultaneously. Without it, each connection would trigger a separate React render cycle. This is the kind of optimization you add after profiling startup with many servers.
-
-**Deduplication is surprisingly complex.** The system deduplicates plugin servers against manual servers, claude.ai connector servers against manual servers, and plugin servers against each other -- all using content-based signatures that compare the actual command arrays or URLs rather than just names. The `unwrapCcrProxyUrl` function even handles the case where a claude.ai connector URL has been rewritten to route through a proxy, extracting the original vendor URL for comparison. This suggests real-world deployment scenarios where users end up with the same server configured multiple ways.
-
-The overall impression is of a system designed by people who have deployed MCP integrations at scale and hit every edge case. The code is pragmatic -- it handles Slack's non-standard OAuth errors, Bun's memory leaks in `AbortSignal.timeout()`, Java MCP SDK servers that reject unknown fields in the elicitation capability declaration, and CCR proxy URL rewriting. Each of these workarounds has comments explaining the specific failure it prevents. That is the mark of production-grade code that has learned from real failures.

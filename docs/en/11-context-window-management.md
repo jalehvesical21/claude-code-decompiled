@@ -474,20 +474,3 @@ The compact system itself tries to reuse the main conversation's prompt cache vi
 
 The consecutive failure circuit breaker (max 3 retries) was added after discovering that 1,279 sessions had 50+ consecutive failures in a single session. The worst offender hit 3,272 consecutive failed compaction attempts. This was burning approximately 250K API calls per day globally -- pure waste on sessions where the context was irrecoverably over the limit.
 
-## 9. My Take
-
-Having traced through the full context management pipeline, a few observations stand out.
-
-**What works well:** The layered approach is sound engineering. Microcompact handles the common case (old tool results clogging the context) cheaply and incrementally. Session memory compaction provides a lighter alternative to full summarization. Full compaction is the heavy artillery, reserved for when smaller measures cannot keep up. The circuit breaker and recursion guards show battle-tested production awareness.
-
-**The summary quality problem:** The fundamental weakness of compaction is information loss. No matter how good the summary prompt is (and it is quite thorough with its 9-section structure), compressing a 167K token conversation into a ~15K token summary necessarily loses detail. Specific error messages, exact code snippets, nuanced user feedback -- some of this will be paraphrased or dropped. The system mitigates this by restoring recently-read files and providing a transcript path for recovery, but the model's working memory of the pre-compact conversation is permanently degraded.
-
-**The post-compact token budget is generous but blunt.** Restoring 5 files at 5K tokens each plus 25K of skill content plus delta attachments can easily push the post-compact context to 50-80K tokens. If the auto-compact threshold is 167K and the summary is 15K, the system has about 152K of headroom -- but 50-80K of that immediately goes to restored context. In sessions with many active files and skills, this can create a compaction loop where the system compacts, restores context, immediately exceeds the threshold, and compacts again.
-
-**The analysis scratchpad is a clever hack.** Using `<analysis>` tags as a chain-of-thought scratchpad that gets stripped before the summary enters context is a pragmatic solution. It improves summary quality at the cost of output tokens but does not waste context space. I would be curious to see ablation data on how much the analysis block actually improves summary fidelity.
-
-**What I would change:** I would want to see more aggressive prioritization in tool result management. Rather than keeping the last N tool results uniformly, the system could score tool results by relevance to the current task -- results from files being actively edited are worth more than results from a grep that was just exploration. I would also want compaction to be more incremental -- instead of the binary "keep everything" / "summarize everything" model, a rolling summarization that compresses older turns at progressively coarser granularity would provide more graceful degradation.
-
-The partial compaction feature (compacting only before or after a specific message) is a step in this direction, and the context collapse system (gated behind a feature flag) appears to be exploring exactly this kind of incremental approach. Whether it graduates from experiment to default will probably depend on how well it handles the edge cases that the current all-or-nothing compaction has been battle-tested against.
-
-Overall, the context management system is a sophisticated piece of production engineering that reflects years of real-world usage data and hard-won lessons about failure modes. The code is dense with comments explaining not just what each piece does, but why it exists -- usually referencing specific bugs, metrics, or production incidents. That is the kind of institutional knowledge that makes a system maintainable, and it reveals just how much engineering effort goes into making a "simple" chat interface work reliably at scale.

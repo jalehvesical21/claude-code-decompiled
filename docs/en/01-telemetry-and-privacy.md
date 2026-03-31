@@ -131,13 +131,3 @@ Source: `src/services/analytics/growthbook.ts`
 
 This is standard practice in SaaS products, but typically users at least know they might be in experiments. There's no visible indicator here.
 
-## My Takeaways
-
-1. **The volume is significant** — hundreds of events per session, covering environment, usage patterns, and session metadata
-2. **No real opt-out exists** for first-party logging if you're on the direct API
-3. **Failed telemetry is persisted to disk** and retried aggressively — they really don't want to miss data
-4. **Data flows to both Anthropic and Datadog**, so your usage data lives in at least two systems
-5. **The `OTEL_LOG_TOOL_DETAILS=1` flag** is a full-content logging escape hatch worth being aware of
-6. **Repo fingerprinting** via SHA256 hashing enables cross-session correlation of your projects
-
-Is any of this unusual for a commercial developer tool? Not wildly — but the combination of aggressive persistence, no user-facing opt-out, and the breadth of environment data collection puts this on the high end of the spectrum. If you're working on anything sensitive, it's worth understanding exactly what's leaving your machine.

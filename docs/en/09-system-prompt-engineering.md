@@ -433,24 +433,3 @@ MEMORY.md entrypoints are capped at 200 lines / 25KB. The truncation is aggressi
 
 Nearly every section function can return `null`, and the final array is filtered with `.filter(s => s !== null)`. Sections that do not apply to the current context are simply absent from the prompt, rather than present as empty strings that would waste cache space.
 
----
-
-## 10. My Take
-
-After reading through this entire system, here are the lessons I would distill for anyone building AI products with long system prompts:
-
-**Treat your system prompt as a build artifact, not a text file.** Claude Code's prompt is assembled from 20+ functions, each with its own conditional logic, feature gates, and user-type branching. This is software engineering applied to prompt engineering. The prompt is tested, versioned, and deployed like code because it IS code.
-
-**Cache economics should drive prompt architecture.** The static/dynamic boundary is not an abstraction nicety -- it is a cost optimization that likely saves Anthropic millions of dollars in prefill compute. If you are paying per-token for prompt caching, every bit of session-specific content that leaks into your static prefix multiplies your cache miss rate by 2^N for N such bits.
-
-**Model-specific behavioral counterweights are a first-class concern.** The `@[MODEL LAUNCH]` annotations and Capybara-specific patches show that prompt engineering is not a one-time activity. Each model generation has its own failure modes (over-commenting, false claims, insufficient thoroughness), and the prompt must compensate. The pattern of gating these patches behind `process.env.USER_TYPE === 'ant'` for A/B testing before rolling out to external users is a mature approach to prompt experimentation.
-
-**Safety is structural, not aspirational.** The `CYBER_RISK_INSTRUCTION` appears in every code path. The actions section enumerates specific dangerous operations with concrete examples. The CLAUDE.md system gives users an override mechanism but places it after (and therefore with higher priority than) the default safety instructions. This layered approach means safety instructions are never accidentally omitted.
-
-**Memory systems need hard limits.** The 200-line / 25KB cap on MEMORY.md with an explicit warning is a design decision born from real problems (users or models creating enormous indexes that consume the entire context window). The two-step save process (write file, then update index) is a clever way to keep the always-loaded index lightweight while allowing unlimited detail in topic files.
-
-**The effort system is the output quality dial that matters most.** The fact that Opus 4.6 defaults to `medium` effort for paying customers, with `ultrathink` as an explicit escalation, suggests that "think harder" is expensive and often unnecessary. The numeric effort values used internally (0-100+ scale mapped to four levels) hint at ongoing experimentation with the granularity of this control.
-
-**Document your prompt engineering decisions.** The Claude Code codebase is remarkably well-commented about WHY specific prompt text exists. Comments reference PR numbers, measured FC rates, eval results, and specific failure modes. This institutional knowledge is essential when the next model ships and someone needs to decide which counterweights to keep, soften, or remove.
-
-This system represents what I would call "industrial-grade prompt engineering" -- the discipline of building reliable AI products where the prompt is not a single artisanal text but a compiled artifact with versioning, caching, feature gates, A/B testing, model-specific patches, and hard operational limits. Anyone building serious AI applications should study this architecture.

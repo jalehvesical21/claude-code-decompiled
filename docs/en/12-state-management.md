@@ -476,30 +476,3 @@ export function getStoredSessionCosts(sessionId: string): StoredCostState | unde
 
 The `stats.ts` module (`src/utils/stats.ts`) provides aggregate statistics across all sessions: total sessions, messages, daily activity, streaks, and per-model token usage. It scans transcript JSONL files under the projects directory and uses a cache (`statsCache.ts`) to avoid re-parsing unchanged files.
 
-## 9. My Take
-
-This is a system that grew organically under real pressure, and it shows -- in both good and bad ways.
-
-**What works well:**
-
-The custom store is a masterclass in restraint. Thirty-four lines of code, no dependencies, and it does exactly what is needed. The temptation to reach for Redux or Zustand in a project this size must have been significant, and resisting it was the right call. The `Object.is` check for preventing unnecessary renders, the immutable update pattern, and the `onChange` callback for side effects -- it is textbook reactive state management without the ceremony.
-
-The UUID-based message chain is clever. By linking messages via parent UUIDs rather than array indices, the system naturally supports branching, sidechains, and forking without complex merge logic. The JSONL format means conversations are append-only on the write path (no read-modify-write cycles), which is both fast and crash-safe.
-
-The session recovery pipeline is impressively thorough. The fact that it can detect whether a session was interrupted mid-prompt, mid-tool-execution, or ended cleanly, and then synthesize the appropriate continuation message -- that is the kind of detail that separates a tool people tolerate from one they trust.
-
-**What is less great:**
-
-The bootstrap singleton is a code smell. The file says "DO NOT ADD MORE STATE HERE" and then defines 100+ fields. The split between bootstrap state and AppState feels arbitrary in places. Cost tracking lives in bootstrap, but model selection lives in both. Session identity is in bootstrap, but session hooks state is in AppState. The boundary is "what existed before React" rather than "what logically belongs together."
-
-The `Project` class in `sessionStorage.ts` is doing too much. It manages the JSONL file handle, buffers pending writes, caches session metadata, handles agent transcripts, and coordinates with the ingress service. It is the kind of god object that accumulates responsibilities because it is the most convenient place to put them.
-
-The config system stores everything in a single JSON file with a growing collection of ad-hoc fields. `memoryUsageCount`, `voiceNoticeSeenCount`, `effortCalloutV2Dismissed` -- these are all top-level fields on a single object. There is no schema versioning or migration system; backward compatibility is handled by optional fields and default values.
-
-**What can we learn:**
-
-The most important lesson is the value of a clear persistence boundary. In-memory state is ephemeral and derived; disk state is the source of truth. When something needs to survive a restart, it gets written to disk. When it does not, it stays in memory. The system does not try to be clever about caching or lazy loading -- it reads what it needs at startup and writes what it needs at shutdown. That simplicity makes the system debuggable: if a session resume fails, you can read the JSONL file and understand exactly what happened.
-
-The second lesson is that file-based persistence at this scale (hundreds of thousands of sessions across millions of users) works surprisingly well. JSONL is append-only, human-readable, and naturally handles concurrent writes (each line is atomic on most filesystems). No database, no migration scripts, no schema evolution headaches. The tradeoff is that queries are expensive (scanning all files for statistics), but for the access patterns Claude Code has (write often, read rarely, scan occasionally), it is the right choice.
-
-The third lesson: sometimes the boring solution is the right one. A 34-line store with no middleware. JSONL files instead of SQLite. A singleton module instead of dependency injection. These choices make the system easy to understand, easy to debug, and hard to break. That matters more than architectural purity when you are building a tool that developers depend on every day.

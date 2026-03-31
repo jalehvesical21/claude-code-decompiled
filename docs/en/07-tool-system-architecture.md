@@ -347,36 +347,3 @@ There's also an important system-level prompt injection defense. The main system
 
 This is a pragmatic defense-in-depth measure against indirect prompt injection through tool results.
 
----
-
-## 7. My Take
-
-### What's Elegant
-
-**The buildTool factory with fail-closed defaults.** Having a single point where all tools are constructed, with conservative defaults for concurrency safety and read-only status, is the kind of infrastructure decision that prevents entire categories of bugs. A new tool author who forgets to set `isConcurrencySafe` gets sequential execution, not data races.
-
-**Exact-match replacement in FileEditTool.** I've seen systems that let AI models do regex replacements on files, and the failure modes are brutal. Claude Code's insistence on exact string matching, combined with uniqueness validation and staleness detection, makes file edits predictable and reversible. The quote normalization layer (`findActualString`) handles the most common source of false negatives without opening the door to fuzzy matching.
-
-**The layered permission model.** Rules from multiple sources (user settings, project settings, session grants, policy, hooks, classifier) are evaluated in a well-defined order. The speculative classifier check that runs in parallel with other permission evaluation is a nice latency optimization. And the denial tracking with fallback-to-prompting threshold prevents the system from silently failing forever when automated checks are misconfigured.
-
-**Prompt-cache-aware sorting.** The fact that `assembleToolPool()` maintains built-in tools as a sorted prefix to preserve API-level cache keys is the kind of detail that only matters at scale -- and matters enormously there.
-
-### What's Pragmatic
-
-**The conditional require pattern for feature gating.** It's not pretty, and the code acknowledges it with comments about DCE complexity budgets. But it works: the Bun bundler can eliminate entire tool trees from external builds, which matters for binary size and attack surface.
-
-**The "a bit of a hack" stream merging.** Progress events and final results flow through the same `Stream<MessageUpdateLazy>` abstraction. The code calls this out honestly. The alternative -- separate channels for progress and results -- would be more principled but would complicate every consumer that needs to display a tool's execution timeline.
-
-**Hardcoded command classification.** Sets like `BASH_SEARCH_COMMANDS`, `BASH_READ_COMMANDS`, `BASH_SILENT_COMMANDS` are manually curated. This is inherently incomplete (someone's custom `mygrep` command won't be recognized), but it's fast, predictable, and doesn't require an LLM call to classify command semantics.
-
-### Lessons for Tool System Designers
-
-1. **Validate before permitting.** Claude Code runs `validateInput()` before `checkPermissions()`. This means the user never gets asked to approve an operation that would fail anyway. It's a small thing that significantly reduces permission fatigue.
-
-2. **Make the default safe, make the override explicit.** Every tool defaults to non-concurrent, non-read-only, non-destructive. Opting into these categories requires explicit declaration. The `dangerouslyDisableSandbox` parameter name on BashTool is a beautiful example of making the scary thing feel scary.
-
-3. **Separate schema from behavior.** The Zod input schema validates structure; `validateInput()` validates semantics; `checkPermissions()` validates authorization. Each layer has its own error format and recovery path. This separation means a Zod error tells the model "your JSON is wrong," a validation error tells it "that operation doesn't make sense," and a permission error tells it "ask the user."
-
-4. **Design for the model's failure modes.** The comment at line 614 -- "Validate input types with zod (surprisingly, the model is not great at generating valid input)" -- reveals a core truth. The tool system is not designed for an ideal caller; it's designed for a probabilistic one that sometimes sends strings where it should send numbers, references files it hasn't read, and tries to edit strings that don't exist. Every validation check is a lesson learned from a real model failure.
-
-5. **Plan for the tool ecosystem to grow.** The MCP integration, ToolSearch deferred loading, and `assembleToolPool()` merging logic all assume that the set of available tools will change at runtime. New MCP servers connect mid-session, tools are filtered by permission changes, and the deferred-loading system means the model only pays the prompt-token cost for tools it actually needs. This is infrastructure designed for a world where the tool count keeps increasing -- which it will.
